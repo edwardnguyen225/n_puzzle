@@ -34,6 +34,9 @@ class Solver:
             pop and expand top of stack until goal found"""
         init_puzzle = puzzle.Puzzle(self.init_state)
         self.stack.append(init_puzzle)
+        if self.init_state == self.goal_state:
+            print("Init puzzle is already at goal state")
+            return [init_puzzle]
 
         while self.stack:
             node = self.stack.pop()
@@ -41,7 +44,7 @@ class Solver:
 
             if node.state == self.goal_state:
                 print("GOAL FOUND")
-                return node.ancestors
+                return node.ancestors + [node]
 
             self.expand_nodes(node)
 
