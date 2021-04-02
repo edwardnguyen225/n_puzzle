@@ -15,15 +15,7 @@ def is_square_number(number):
     return True
 
 
-def main(argv):
-    if len(argv) < 1:
-        print_usage()
-        sys.exit()
-
-    # convert input string to a list of integers
-    input_list = argv[0].split(',')
-    input_list = list(map(int, input_list))
-
+def is_input_list_a_valid_puzzle(input_list):
     if not is_square_number(len(input_list)):
         raise Exception(
             "Error: input grid must be nxn square")
@@ -33,6 +25,33 @@ def main(argv):
         if number != index:
             raise Exception(
                 "Error: input list must contain all numbers from 0 to n^2 - 1")
+
+    return True
+
+
+def main(argv):
+    if len(argv) < 1:
+        print_usage()
+        sys.exit()
+
+    # convert input string to a list of integers
+    input_list = argv[0].split(',')
+    input_list = list(map(int, input_list))
+
+    try:
+        is_input_list_a_valid_puzzle(input_list)
+    except Exception:
+        raise Exception("Invalid input puzzle")
+
+    global solver
+    try:
+        solver = solver.Solver(input_list)
+    except Exception:
+        raise Exception("No solution")
+
+    solution = solver.depth_first_search()
+    for step in solution:
+        print(step)
 
 
 if __name__ == "__main__":

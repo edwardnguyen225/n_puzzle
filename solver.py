@@ -1,13 +1,77 @@
 import puzzle
-# import custom_structures
 import copy
 import math
-# import metric
+import random
+from collections import deque
+
+# all state from now on are instance of class Puzzle (which is in grid, 2d list)
+
+
+def does_state_exist(item, list_to_search):
+    """Search only `state` properties of members"""
+    for element in list_to_search:
+        if item.state == element.state:
+            return True
+    return False
 
 
 class Solver:
     def __init__(self, input_list):
-        pass
+        """Initialise Solver object. Raise ValueError if solution not possible."""
+
+        if not self.solvable(input_list):
+            raise Exception('The puzzle is not solvable')
+
+        self.init_state = copy.deepcopy(puzzle.list_to_grid(input_list))
+        self.goal_state = self.set_goal_state(input_list)
+        self.depth = 0
+
+        self.stack = deque()
+        self.visited = deque()
+
+    def depth_first_search(self):
+        """ While stack is not empty,
+            pop and expand top of stack until goal found"""
+        init_puzzle = puzzle.Puzzle(self.init_state)
+        self.stack.append(init_puzzle)
+
+        while self.stack:
+            node = self.stack.pop()
+            print(f'Stack len: {len(self.stack)}')
+
+            self.visited.append(node)
+            self.depth += 1
+
+            if node.state == self.goal_state:
+                print("GOAL FOUND")
+                return node.ancestors
+
+            self.expand_nodes(node)
+
+        # The method should not go here
+        raise Exception("Something went wrong in DFS, this line should not be reached")
+
+    def expand_nodes(self, node):
+        moves_list = ["up", "down", "left", "right"]
+        # random.shuffle(moves_list)
+
+        for direction in moves_list:
+            new_node = node.copy()
+
+            if new_node.move(direction):
+                new_node.ancestors.append(node)
+
+            if does_state_exist(new_node, self.stack) and does_state_exist(new_node, self.visited):
+                self.stack.append(new_node)
+
+    def set_goal_state(self, input_list):
+        ordered_list = sorted(input_list)
+        # Bring blank cell from first index to the end
+        ordered_list.pop(0)
+        ordered_list.append(0)
+
+        goal_state = puzzle.list_to_grid(ordered_list)
+        return goal_state
 
     def solvable(self, input_list):
         """Determine if a given input grid is solvable.
