@@ -2,6 +2,7 @@ import puzzle
 import copy
 import math
 import random
+import os
 from collections import deque
 
 # all state from now on are instance of class Puzzle (which is in grid, 2d list)
@@ -24,7 +25,6 @@ class Solver:
 
         self.init_state = copy.deepcopy(puzzle.list_to_grid(input_list))
         self.goal_state = self.set_goal_state(input_list)
-        self.depth = 0
 
         self.stack = deque()
         self.visited = deque()
@@ -37,10 +37,7 @@ class Solver:
 
         while self.stack:
             node = self.stack.pop()
-            print(f'Stack len: {len(self.stack)}')
-
             self.visited.append(node)
-            self.depth += 1
 
             if node.state == self.goal_state:
                 print("GOAL FOUND")
@@ -49,7 +46,8 @@ class Solver:
             self.expand_nodes(node)
 
         # The method should not go here
-        raise Exception("Something went wrong in DFS, this line should not be reached")
+        raise Exception(
+            "Something went wrong in DFS, this line should not be reached")
 
     def expand_nodes(self, node):
         moves_list = ["up", "down", "left", "right"]
@@ -57,11 +55,10 @@ class Solver:
 
         for direction in moves_list:
             new_node = node.copy()
-
             if new_node.move(direction):
                 new_node.ancestors.append(node)
 
-            if does_state_exist(new_node, self.stack) and does_state_exist(new_node, self.visited):
+            if not does_state_exist(new_node, self.stack) and not does_state_exist(new_node, self.visited):
                 self.stack.append(new_node)
 
     def set_goal_state(self, input_list):

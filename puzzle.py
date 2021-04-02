@@ -39,7 +39,7 @@ class Puzzle:
         self.n = len(state[0])
 
     def __str__(self):
-        display = f'Step: {self.depth}'
+        display = f'Step: {self.depth} - Move: {self.previous_move}'
         for row in self.state:
             display += f'\n{row}'
         return display
@@ -67,9 +67,9 @@ class Puzzle:
         # when we say 'move left' we mean the tile, not the space (0)
         delta_x, delta_y = 0, 0
         if direction == 'up':
-            delta_y = 1
-        elif direction == 'down':
             delta_y = -1
+        elif direction == 'down':
+            delta_y = 1
         elif direction == 'left':
             delta_x = -1
         elif direction == 'right':
@@ -86,10 +86,15 @@ class Puzzle:
             return False
 
         # swap tiles, update node properties, return new Node
+        # print(f'(hang, cot) = ({old_y},{old_x}) ==> ({new_y},{new_x})')
         new_state = copy.deepcopy(self.state)
-        new_state[old_x][old_y], new_state[new_x][new_y] = new_state[new_x][new_y], new_state[old_x][old_y]
+        new_state[old_y][old_x] = new_state[new_y][new_x]
+        new_state[new_y][new_x] = 0
+
+        self.state = new_state
         self.previous_move = direction
         self.depth += 1
+        # print(str(self))
 
         return True
 
